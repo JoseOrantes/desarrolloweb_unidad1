@@ -22,10 +22,11 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 
-@Composable
+@Composable //Vuelve el siguiente codigo parte del UI
 fun LoginScreen(
     modifier: Modifier = Modifier,
     loginViewModel: LoginViewModel = viewModel(),
+    //Preparo la data a recibir en un lambda (callback)
     onLoginSuccess: (id: Int, token: String, nombre: String, apellido: String, usuario: String) -> Unit = { _, _, _, _, _ -> },
     onRegisterClick: () -> Unit = {}
 ) {

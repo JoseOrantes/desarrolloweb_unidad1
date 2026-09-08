@@ -33,7 +33,7 @@ class RegisterViewModel : ViewModel() {
                 apellido = _state.value.apellido,
                 usuario = _state.value.usuario,
                 password = _state.value.password,
-                fotoBase64 = "", // TODO: Implement image selection
+                fotoBase64 = "", // TODO: Implementar imagen
                 telefono = _state.value.telefono,
                 correo = _state.value.correo,
                 fechaNac = _state.value.fechaNac,

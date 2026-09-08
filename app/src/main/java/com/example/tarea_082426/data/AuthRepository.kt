@@ -7,22 +7,15 @@ import com.example.tarea_082426.model.response.LoginResponse
 import com.example.tarea_082426.model.response.ProfileResponse
 import com.example.tarea_082426.model.response.RegisterResponse
 
-/*
-class AuthRepository{
-    fun login(email: String, password: String): Boolean {
-        return email == "admin@email.com" && password == "1234"
-        //TODO Agregar backend usando retrofit
-    }
-}
-*/
-
 class AuthRepository {
 
-    private val apiService = RetrofitClient.apiService
+    private val apiLogin = RetrofitClient.apiLogin
+    private val apiRegister = RetrofitClient.apiRegister
+    private val apiProfile = RetrofitClient.apiProfile
 
     suspend fun login(usuario: String, password: String): Result<LoginResponse> {
         return try {
-            val response = apiService.login(LoginRequest(usuario, password))
+            val response = apiLogin.login(LoginRequest(usuario, password))
             if (response.isSuccessful && response.body() != null) {
                 Result.success(response.body()!!)
             } else {
@@ -35,7 +28,7 @@ class AuthRepository {
 
     suspend fun register(request: RegisterRequest): Result<RegisterResponse> {
         return try {
-            val response = apiService.register(request)
+            val response = apiRegister.register(request)
             if (response.isSuccessful && response.body() != null) {
                 Result.success(response.body()!!)
             } else {
@@ -48,7 +41,7 @@ class AuthRepository {
 
     suspend fun getProfile(id: Int): Result<ProfileResponse> {
         return try {
-            val response = apiService.getProfile(id)
+            val response = apiProfile.getProfile(id)
             if (response.isSuccessful && response.body() != null) {
                 Result.success(response.body()!!)
             } else {
@@ -61,7 +54,7 @@ class AuthRepository {
 
     suspend fun getUser(id: Int): Result<Map<String, Any>> {
         return try {
-            val response = apiService.getUser(id)
+            val response = apiProfile.getUser(id)
             if (response.isSuccessful && response.body() != null) {
                 Result.success(response.body()!!)
             } else {

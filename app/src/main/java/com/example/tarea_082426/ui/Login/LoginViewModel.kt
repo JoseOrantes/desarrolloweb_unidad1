@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 
 class LoginViewModel : ViewModel() {
 
+    //_state sera la privada y state es el acceso para los demas
     private val repository = AuthRepository()
 
     private val _state = MutableStateFlow(LoginState())
@@ -24,7 +25,7 @@ class LoginViewModel : ViewModel() {
         _state.value = _state.value.copy(password = nuevoPassword)
     }
 
-    //Parametros vienen del modelo (dto)
+    //Parametros vienen del modelo LoginState
     fun onLoginClick(){
         viewModelScope.launch {
             val resultado = repository.login(_state.value.email.trim(), _state.value.password.trim())
