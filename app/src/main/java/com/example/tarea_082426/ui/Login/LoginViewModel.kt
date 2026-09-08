@@ -1,10 +1,12 @@
 package com.example.tarea_082426.ui.Login
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.tarea_082426.data.AuthRepository
 import com.example.tarea_082426.model.LoginState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 class LoginViewModel : ViewModel() {
 
@@ -24,10 +26,26 @@ class LoginViewModel : ViewModel() {
 
     //Parametros vienen del modelo (dto)
     fun onLoginClick(){
-        val resultado = repository.login(_state.value.email, _state.value.password)
-        _state.value = _state.value.copy(
-            mensaje = if (resultado) "Bienvenido!" else "Creenciales Incorrectos",
-            loginExitoso = resultado
-        )
+        viewModelScope.launch {
+            val resultado = repository.login(_state.value.email.trim(), _state.value.password.trim())
+
+            resultado.onSuccess { response ->
+                val user = response.body?.user
+                _state.value = _state.value.copy(
+                    loginExitoso = true,
+                    id = user?.id ?: 0,
+                    email = user?.email ?: "",
+                    token = response.body?.token ?: user?.token ?: "",
+                    nombre = user?.nombre ?: "",
+                    apellido = user?.apellido ?: "",
+                    usuario = user?.usuario ?: ""
+                )
+            }.onFailure { error ->
+                _state.value = _state.value.copy(
+                    loginExitoso = false,
+                    mensaje = error.message ?: "Error desconocido"
+                )
+            }
+        }
     }
 }
