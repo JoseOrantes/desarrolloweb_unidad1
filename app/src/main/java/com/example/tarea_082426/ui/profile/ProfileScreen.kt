@@ -14,27 +14,45 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun ProfileScreen(
+    id: Int,
     nombre: String,
     apellido: String,
     usuario: String,
     onLogoutClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    profileViewModel: ProfileViewModel = viewModel()
 ) {
+    val state by profileViewModel.state.collectAsState()
+
+    LaunchedEffect(id) {
+        profileViewModel.loadProfile(id)
+    }
+
+    // Usamos los datos del estado (de la DB) o los parámetros (de la navegación) como respaldo
+    val displayNombre = if (state.nombre.isNotEmpty()) state.nombre else nombre
+    val displayApellido = if (state.apellido.isNotEmpty()) state.apellido else apellido
+    val displayUsuario = if (state.usuario.isNotEmpty()) state.usuario else usuario
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -56,7 +74,7 @@ fun ProfileScreen(
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Text(
-                    text = "${nombre.firstOrNull() ?: ""}${apellido.firstOrNull() ?: ""}",
+                    text = "${displayNombre.firstOrNull() ?: ""}${displayApellido.firstOrNull() ?: ""}",
                     fontSize = 36.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onPrimary
@@ -67,7 +85,7 @@ fun ProfileScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "$nombre $apellido",
+            text = "$displayNombre $displayApellido",
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold
         )
@@ -81,11 +99,30 @@ fun ProfileScreen(
             )
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
-                ProfileInfoRow(label = "Nombre", value = nombre)
-                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                ProfileInfoRow(label = "Apellido", value = apellido)
-                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                ProfileInfoRow(label = "Usuario", value = usuario)
+                if (state.isLoading) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                } else {
+                    ProfileInfoRow(label = "Nombre", value = displayNombre)
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                    ProfileInfoRow(label = "Apellido", value = displayApellido)
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                    ProfileInfoRow(label = "Usuario", value = displayUsuario)
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                    ProfileInfoRow(label = "Correo", value = state.correo)
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                    ProfileInfoRow(label = "Teléfono", value = state.telefono)
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                    ProfileInfoRow(label = "Fecha Nac.", value = state.fechaNac)
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                    ProfileInfoRow(label = "Género", value = state.genero)
+                }
             }
         }
 

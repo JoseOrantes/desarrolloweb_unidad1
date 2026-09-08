@@ -3,6 +3,7 @@ package com.example.tarea_082426.data
 import com.example.tarea_082426.data.remote.RetrofitClient
 import com.example.tarea_082426.model.request.LoginRequest
 import com.example.tarea_082426.model.response.LoginResponse
+import com.example.tarea_082426.model.response.ProfileResponse
 
 /*
 class AuthRepository{
@@ -27,6 +28,32 @@ class AuthRepository {
             }
         } catch (e: Exception) {
             Result.failure(Exception("Error de conexión: ${e.message}"))
+        }
+    }
+
+    suspend fun getProfile(id: Int): Result<ProfileResponse> {
+        return try {
+            val response = apiService.getProfile(id)
+            if (response.isSuccessful && response.body() != null) {
+                Result.success(response.body()!!)
+            } else {
+                Result.failure(Exception("Perfil no encontrado"))
+            }
+        } catch (e: Exception) {
+            Result.failure(Exception("Error de conexión: ${e.message}"))
+        }
+    }
+
+    suspend fun getUser(id: Int): Result<Map<String, Any>> {
+        return try {
+            val response = apiService.getUser(id)
+            if (response.isSuccessful && response.body() != null) {
+                Result.success(response.body()!!)
+            } else {
+                Result.failure(Exception("Usuario no encontrado"))
+            }
+        } catch (e: Exception) {
+            Result.failure(Exception("Error de red: ${e.message}"))
         }
     }
 }

@@ -35,7 +35,7 @@ class LoginViewModel : ViewModel() {
                     loginExitoso = true,
                     id = user?.id ?: 0,
                     email = user?.email ?: "",
-                    token = response.body?.token ?: user?.token ?: "",
+                    token = response.body?.token ?: "",
                     nombre = user?.nombre ?: "",
                     apellido = user?.apellido ?: "",
                     usuario = user?.usuario ?: ""
