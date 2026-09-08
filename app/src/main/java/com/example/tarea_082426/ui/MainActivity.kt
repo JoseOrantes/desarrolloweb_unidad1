@@ -27,6 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.tarea_082426.ui.theme.Tarea_082426Theme
 import androidx.compose.material3.Button
+import com.example.tarea_082426.ui.Login.LoginScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,66 +45,5 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun LoginScreen(modifier: Modifier = Modifier) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var mensaje by remember { mutableStateOf("") }
-
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(32.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "Iniciar Sesion",
-            style = MaterialTheme.typography.headlineMedium
-        )
-        Spacer(modifier = Modifier.height(24.dp))
-
-        OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Email") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("Contrasena") },
-            visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Button(
-            onClick = {
-                if (email == "admin@email.com" && password == "1234") {
-                    mensaje = "Bienvenido"
-                } else {
-                    mensaje = "Credenciales Incorrectas"
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Ingresar")
-        }
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Text(
-            text = mensaje,
-            color = if (mensaje == "Bienvenido"){
-                MaterialTheme.colorScheme.primary
-            } else {
-                MaterialTheme.colorScheme.error
-            }
-        )
-
-    }
-}
 
 
