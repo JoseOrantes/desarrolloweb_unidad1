@@ -2,8 +2,10 @@ package com.example.tarea_082426.data
 
 import com.example.tarea_082426.data.remote.RetrofitClient
 import com.example.tarea_082426.model.request.LoginRequest
+import com.example.tarea_082426.model.request.RegisterRequest
 import com.example.tarea_082426.model.response.LoginResponse
 import com.example.tarea_082426.model.response.ProfileResponse
+import com.example.tarea_082426.model.response.RegisterResponse
 
 /*
 class AuthRepository{
@@ -25,6 +27,19 @@ class AuthRepository {
                 Result.success(response.body()!!)
             } else {
                 Result.failure(Exception("Credenciales incorrectas"))
+            }
+        } catch (e: Exception) {
+            Result.failure(Exception("Error de conexión: ${e.message}"))
+        }
+    }
+
+    suspend fun register(request: RegisterRequest): Result<RegisterResponse> {
+        return try {
+            val response = apiService.register(request)
+            if (response.isSuccessful && response.body() != null) {
+                Result.success(response.body()!!)
+            } else {
+                Result.failure(Exception("Error en el registro"))
             }
         } catch (e: Exception) {
             Result.failure(Exception("Error de conexión: ${e.message}"))

@@ -13,6 +13,8 @@ import androidx.navigation.navArgument
 import com.example.tarea_082426.ui.Login.LoginScreen
 import com.example.tarea_082426.ui.Login.LoginViewModel
 import com.example.tarea_082426.ui.profile.ProfileScreen
+import com.example.tarea_082426.ui.register.RegisterScreen
+import com.example.tarea_082426.ui.register.RegisterViewModel
 
 
 object AppRoutes { // Define las rutas (URLs internas) de la app
@@ -48,7 +50,25 @@ fun AppNavigator( // El "GPS" de la aplicacion
                     navController.navigate(AppRoutes.profileRoute(id, token, nombre, apellido, usuario)) {
                         popUpTo(AppRoutes.LOGIN) { inclusive = true }
                     }
+                },
+                modifier = Modifier,
+                onRegisterClick = {
+                    navController.navigate(AppRoutes.REGISTER)
                 }
+            )
+        }
+        composable(AppRoutes.REGISTER) {
+            val viewModel: RegisterViewModel = viewModel()
+            RegisterScreen(
+                onRegisterSuccess = {
+                    navController.navigate(AppRoutes.LOGIN) {
+                        popUpTo(AppRoutes.REGISTER) { inclusive = true }
+                    }
+                },
+                onBackToLogin = {
+                    navController.popBackStack()
+                },
+                registerViewModel = viewModel
             )
         }
         composable(

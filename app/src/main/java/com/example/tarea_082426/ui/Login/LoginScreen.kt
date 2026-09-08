@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,7 +26,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 fun LoginScreen(
     modifier: Modifier = Modifier,
     loginViewModel: LoginViewModel = viewModel(),
-    onLoginSuccess: (id: Int, token: String, nombre: String, apellido: String, usuario: String) -> Unit = { _, _, _, _, _ -> }
+    onLoginSuccess: (id: Int, token: String, nombre: String, apellido: String, usuario: String) -> Unit = { _, _, _, _, _ -> },
+    onRegisterClick: () -> Unit = {}
 ) {
 
     val state by loginViewModel.state.collectAsState()
@@ -75,6 +77,15 @@ fun LoginScreen(
         ) {
             Text("Ingresar")
         }
+        Spacer(modifier = Modifier.height(16.dp))
+
+        OutlinedButton(
+            onClick = onRegisterClick,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Crear Cuenta")
+        }
+
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(

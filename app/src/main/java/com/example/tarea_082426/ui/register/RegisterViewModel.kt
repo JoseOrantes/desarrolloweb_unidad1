@@ -1,4 +1,60 @@
 package com.example.tarea_082426.ui.register
 
-class RegisterViewModel {
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.tarea_082426.data.AuthRepository
+import com.example.tarea_082426.model.RegisterState
+import com.example.tarea_082426.model.request.RegisterRequest
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+
+class RegisterViewModel : ViewModel() {
+    private val repository = AuthRepository()
+
+    private val _state = MutableStateFlow(RegisterState())
+    val state: StateFlow<RegisterState> = _state
+
+    fun onNombreChange(valor: String) { _state.value = _state.value.copy(nombre = valor) }
+    fun onApellidoChange(valor: String) { _state.value = _state.value.copy(apellido = valor) }
+    fun onUsuarioChange(valor: String) { _state.value = _state.value.copy(usuario = valor) }
+    fun onPasswordChange(valor: String) { _state.value = _state.value.copy(password = valor) }
+    fun onCorreoChange(valor: String) { _state.value = _state.value.copy(correo = valor) }
+    fun onTelefonoChange(valor: String) { _state.value = _state.value.copy(telefono = valor) }
+    fun onFechaNacChange(valor: String) { _state.value = _state.value.copy(fechaNac = valor) }
+    fun onGeneroChange(valor: String) { _state.value = _state.value.copy(genero = valor) }
+
+    fun onRegisterClick() {
+        viewModelScope.launch {
+            _state.value = _state.value.copy(isLoading = true, mensaje = "")
+            
+            val request = RegisterRequest(
+                nombre = _state.value.nombre,
+                apellido = _state.value.apellido,
+                usuario = _state.value.usuario,
+                password = _state.value.password,
+                fotoBase64 = "", // TODO: Implement image selection
+                telefono = _state.value.telefono,
+                correo = _state.value.correo,
+                fechaNac = _state.value.fechaNac,
+                genero = _state.value.genero
+            )
+
+            val result = repository.register(request)
+            
+            result.onSuccess {
+                _state.value = _state.value.copy(
+                    isLoading = false,
+                    registroExitoso = true,
+                    mensaje = "Registro exitoso"
+                )
+            }.onFailure { error ->
+                _state.value = _state.value.copy(
+                    isLoading = false,
+                    registroExitoso = false,
+                    mensaje = error.message ?: "Error en el registro"
+                )
+            }
+        }
+    }
 }
