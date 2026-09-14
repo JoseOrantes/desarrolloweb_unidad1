@@ -2,7 +2,7 @@ package com.example.tarea_082426.data
 
 import com.example.tarea_082426.data.remote.RetrofitClient
 import com.example.tarea_082426.model.request.RegisterRequest
-import com.example.tarea_082426.model.response.RegisterResponse
+import com.example.tarea_082426.model.response.Register.RegisterResponse
 
 class RegisterRepository {
     private val apiRegister = RetrofitClient.apiRegister

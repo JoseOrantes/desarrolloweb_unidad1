@@ -5,6 +5,7 @@ data class RegisterRequest(
     val apellido: String,
     val usuario: String,
     val password: String,
+    val password1: String,
     val fotoBase64: String,
     val telefono: String,
     val correo: String,

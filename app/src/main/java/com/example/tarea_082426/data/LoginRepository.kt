@@ -3,9 +3,9 @@ package com.example.tarea_082426.data
 import com.example.tarea_082426.data.remote.RetrofitClient
 import com.example.tarea_082426.model.request.LoginRequest
 //import com.example.tarea_082426.model.request.RegisterRequest
-import com.example.tarea_082426.model.response.LoginResponse
-import com.example.tarea_082426.model.response.ProfileResponse
-//import com.example.tarea_082426.model.response.RegisterResponse
+import com.example.tarea_082426.model.response.Login.LoginResponse
+
+//import com.example.tarea_082426.model.response.Register.RegisterResponse
 
 class LoginRepository {
 

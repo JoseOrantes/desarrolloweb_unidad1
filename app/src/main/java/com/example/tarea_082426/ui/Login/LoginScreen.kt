@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -57,7 +58,7 @@ fun LoginScreen(
             value = state.email,
             onValueChange = { loginViewModel.onEmailChange(it) },
             label = { Text("Email") },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.width(300.dp)
         )
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -66,7 +67,7 @@ fun LoginScreen(
             onValueChange = { loginViewModel.onPasswordChange(it) },
             label = { Text("Password") },
             visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.width(300.dp)
         )
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -74,7 +75,7 @@ fun LoginScreen(
             onClick = {
                 loginViewModel.onLoginClick()
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.width(300.dp)
         ) {
             Text("Ingresar")
         }
@@ -82,7 +83,7 @@ fun LoginScreen(
 
         OutlinedButton(
             onClick = onRegisterClick,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.width(300.dp)
         ) {
             Text("Crear Cuenta")
         }

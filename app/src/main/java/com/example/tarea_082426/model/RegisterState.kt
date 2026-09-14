@@ -5,6 +5,7 @@ data class RegisterState(
     val apellido: String = "",
     val usuario: String = "",
     val password: String = "",
+    val password1: String = "",
     val correo: String = "",
     val telefono: String = "",
     val fechaNac: String = "",

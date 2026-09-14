@@ -1,6 +1,6 @@
 package com.example.tarea_082426.data.remote
 
-import com.example.tarea_082426.model.response.ProfileResponse
+import com.example.tarea_082426.model.response.Profile.ProfileResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path

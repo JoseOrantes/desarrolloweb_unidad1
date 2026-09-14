@@ -1,7 +1,7 @@
 package com.example.tarea_082426.data
 
 import com.example.tarea_082426.data.remote.RetrofitClient
-import com.example.tarea_082426.model.response.ProfileResponse
+import com.example.tarea_082426.model.response.Profile.ProfileResponse
 
 class ProfileRepository {
 

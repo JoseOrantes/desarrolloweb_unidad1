@@ -19,6 +19,7 @@ class RegisterViewModel : ViewModel() {
     fun onApellidoChange(valor: String) { _state.value = _state.value.copy(apellido = valor) }
     fun onUsuarioChange(valor: String) { _state.value = _state.value.copy(usuario = valor) }
     fun onPasswordChange(valor: String) { _state.value = _state.value.copy(password = valor) }
+    fun onPassword1Change(valor: String) { _state.value = _state.value.copy(password1 = valor) }
     fun onCorreoChange(valor: String) { _state.value = _state.value.copy(correo = valor) }
     fun onTelefonoChange(valor: String) { _state.value = _state.value.copy(telefono = valor) }
     fun onFechaNacChange(valor: String) { _state.value = _state.value.copy(fechaNac = valor) }
@@ -26,6 +27,15 @@ class RegisterViewModel : ViewModel() {
 
     fun onRegisterClick() {
         viewModelScope.launch {
+            //Si no coinciden no envia peticion a servidor
+            if (_state.value.password != _state.value.password1) {
+                _state.value = _state.value.copy(
+                    mensaje = "Las contraseñas no coinciden",
+                    registroExitoso = false
+                )
+                return@launch
+            }
+
             _state.value = _state.value.copy(isLoading = true, mensaje = "")
             
             val request = RegisterRequest(
@@ -33,6 +43,7 @@ class RegisterViewModel : ViewModel() {
                 apellido = _state.value.apellido,
                 usuario = _state.value.usuario,
                 password = _state.value.password,
+                password1 = _state.value.password1,
                 fotoBase64 = "", // TODO: Implementar imagen
                 telefono = _state.value.telefono,
                 correo = _state.value.correo,

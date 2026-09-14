@@ -1,4 +1,4 @@
-package com.example.tarea_082426.model.response
+package com.example.tarea_082426.model.response.Profile
 
 data class ProfileBody(
     val id: Int?,
