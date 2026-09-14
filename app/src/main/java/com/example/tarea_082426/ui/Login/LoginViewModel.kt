@@ -2,7 +2,7 @@ package com.example.tarea_082426.ui.Login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tarea_082426.data.AuthRepository
+import com.example.tarea_082426.data.LoginRepository
 import com.example.tarea_082426.model.LoginState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 class LoginViewModel : ViewModel() {
 
     //_state sera la privada y state es el acceso para los demas
-    private val repository = AuthRepository()
+    private val repository = LoginRepository()
 
     private val _state = MutableStateFlow(LoginState())
 

@@ -2,14 +2,14 @@ package com.example.tarea_082426.ui.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tarea_082426.data.AuthRepository
 import com.example.tarea_082426.model.ProfileState
+import com.example.tarea_082426.data.ProfileRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class ProfileViewModel : ViewModel() {
-    private val repository = AuthRepository()
+    private val repository = ProfileRepository()
 
     private val _state = MutableStateFlow(ProfileState())
     val state: StateFlow<ProfileState> = _state

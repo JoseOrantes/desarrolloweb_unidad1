@@ -2,7 +2,7 @@ package com.example.tarea_082426.ui.register
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tarea_082426.data.AuthRepository
+import com.example.tarea_082426.data.RegisterRepository
 import com.example.tarea_082426.model.RegisterState
 import com.example.tarea_082426.model.request.RegisterRequest
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class RegisterViewModel : ViewModel() {
-    private val repository = AuthRepository()
+    private val repository = RegisterRepository()
 
     private val _state = MutableStateFlow(RegisterState())
     val state: StateFlow<RegisterState> = _state

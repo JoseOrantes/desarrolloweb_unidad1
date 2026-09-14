@@ -2,15 +2,15 @@ package com.example.tarea_082426.data
 
 import com.example.tarea_082426.data.remote.RetrofitClient
 import com.example.tarea_082426.model.request.LoginRequest
-import com.example.tarea_082426.model.request.RegisterRequest
+//import com.example.tarea_082426.model.request.RegisterRequest
 import com.example.tarea_082426.model.response.LoginResponse
 import com.example.tarea_082426.model.response.ProfileResponse
-import com.example.tarea_082426.model.response.RegisterResponse
+//import com.example.tarea_082426.model.response.RegisterResponse
 
-class AuthRepository {
+class LoginRepository {
 
     private val apiLogin = RetrofitClient.apiLogin
-    private val apiRegister = RetrofitClient.apiRegister
+    //private val apiRegister = RetrofitClient.apiRegister
     private val apiProfile = RetrofitClient.apiProfile
 
     suspend fun login(usuario: String, password: String): Result<LoginResponse> {
@@ -26,7 +26,7 @@ class AuthRepository {
         }
     }
 
-    suspend fun register(request: RegisterRequest): Result<RegisterResponse> {
+    /*suspend fun register(request: RegisterRequest): Result<RegisterResponse> {
         return try {
             val response = apiRegister.register(request)
             if (response.isSuccessful && response.body() != null) {
@@ -63,5 +63,5 @@ class AuthRepository {
         } catch (e: Exception) {
             Result.failure(Exception("Error de red: ${e.message}"))
         }
-    }
+    } */
 }
