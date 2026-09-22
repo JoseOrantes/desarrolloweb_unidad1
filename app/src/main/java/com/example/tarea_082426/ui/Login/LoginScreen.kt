@@ -19,6 +19,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -33,6 +34,7 @@ fun LoginScreen(
 ) {
 
     val state by loginViewModel.state.collectAsState()
+    val context = LocalContext.current
 
     LaunchedEffect(state.loginExitoso) {
         if (state.loginExitoso) {
@@ -73,7 +75,7 @@ fun LoginScreen(
 
         Button(
             onClick = {
-                loginViewModel.onLoginClick()
+                loginViewModel.onLoginClick(context)
             },
             modifier = Modifier.width(300.dp)
         ) {

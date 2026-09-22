@@ -1,5 +1,6 @@
 package com.example.tarea_082426.ui.Login
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tarea_082426.data.LoginRepository
@@ -26,9 +27,9 @@ class LoginViewModel : ViewModel() {
     }
 
     //Parametros vienen del modelo LoginState
-    fun onLoginClick(){
+    fun onLoginClick(context: Context){
         viewModelScope.launch {
-            val resultado = repository.login(_state.value.email.trim(), _state.value.password.trim())
+            val resultado = repository.login(context, _state.value.email.trim(), _state.value.password.trim())
 
             resultado.onSuccess { response ->
                 val user = response.body?.user
