@@ -2,9 +2,12 @@ package com.example.tarea_082426.data
 
 import android.content.Context
 import com.example.tarea_082426.data.local.DatabaseProvider
+import com.example.tarea_082426.data.local.dao.Profile
 import com.example.tarea_082426.data.local.entities.User
 import com.example.tarea_082426.data.remote.RetrofitClient
+import com.example.tarea_082426.model.response.Profile.ProfileBody
 import com.example.tarea_082426.model.response.Profile.ProfileResponse
+import com.example.tarea_082426.model.response.StandardResponse
 
 class ProfileRepository {
 
@@ -23,6 +26,69 @@ class ProfileRepository {
         }
     }
 
+    suspend fun getProfileOfflineFirst(context: Context, id: Int): Result<ProfileResponse> {
+        val profileDao = DatabaseProvider.getDatabase(context).profileDao()
+
+        return try {
+            val response = apiProfile.getProfile(id)
+            if (response.isSuccessful && response.body() != null) {
+                val profileResponse = response.body()!!
+                val profileBody = profileResponse.body
+                if (profileBody != null) {
+                    val localProfile = Profile(
+                        userId = id,
+                        fotoBase64 = profileBody.fotoBase64 ?: "",
+                        telefono = profileBody.telefono ?: "",
+                        correo = profileBody.correo ?: "",
+                        fechaNac = profileBody.fechaNac ?: "",
+                        genero = profileBody.genero ?: ""
+                    )
+                    profileDao.insertAll(localProfile)
+                }
+                Result.success(profileResponse)
+            } else {
+                val localProfile = profileDao.loadById(id)
+                if (localProfile != null) {
+                    val dummyResponse = ProfileResponse(
+                        standardResponse = StandardResponse(200, "Profile Offline Exitoso"),
+                        body = ProfileBody(
+                            id = localProfile.userId,
+                            userId = localProfile.userId,
+                            fotoBase64 = localProfile.fotoBase64,
+                            telefono = localProfile.telefono,
+                            correo = localProfile.correo,
+                            fechaNac = localProfile.fechaNac,
+                            genero = localProfile.genero
+                        )
+                    )
+                    Result.success(dummyResponse)
+                } else {
+                    Result.failure(Exception("Profile not found"))
+                }
+            }
+        } catch (e: Exception) {
+            // Si falla la red (offline), usar SQLite local
+            val localProfile = profileDao.loadById(id)
+            if (localProfile != null) {
+                val dummyResponse = ProfileResponse(
+                    standardResponse = StandardResponse(200, "Profile Offline Exitoso"),
+                    body = ProfileBody(
+                        id = localProfile.userId,
+                        userId = localProfile.userId,
+                        fotoBase64 = localProfile.fotoBase64,
+                        telefono = localProfile.telefono,
+                        correo = localProfile.correo,
+                        fechaNac = localProfile.fechaNac,
+                        genero = localProfile.genero
+                    )
+                )
+                Result.success(dummyResponse)
+            } else {
+                Result.failure(Exception("Sin conexión y no hay perfil local"))
+            }
+        }
+    }
+
     suspend fun getUser(id: Int): Result<Map<String, Any>> {
         return try {
             val response = apiProfile.getUser(id)
@@ -36,40 +102,71 @@ class ProfileRepository {
         }
     }
 
-    //Si api esta offline
+    // CODIGO ORIGINAL:
+    // suspend fun getUserOfflineFirst(context: Context, id: Int): Result<User> {
+    //     val loginDao = DatabaseProvider.getDatabase(context).loginDao()
+    //     val localUser = loginDao.loadById(intArrayOf(id)).firstOrNull()
+    //     if (localUser != null) {
+    //         return Result.success(localUser)
+    //     }
+    //     return try {
+    //         val response = apiProfile.getUser(id)
+    //         if (response.isSuccessful && response.body() != null) {
+    //             val data = response.body()!!
+    //             val userFromServer = User(
+    //                 id_user = id,
+    //                 nombre = data["nombre"]?.toString() ?: "",
+    //                 apellido = data["apellido"]?.toString() ?: "",
+    //                 usuario = data["usuario"]?.toString() ?: "",
+    //                 password = "",
+    //                 email = data["email"]?.toString() ?: ""
+    //             )
+    //             loginDao.insertAll(userFromServer)
+    //             Result.success(userFromServer)
+    //         } else { ... }
+    //     } catch (e: Exception) { ... }
+    // }
+
     suspend fun getUserOfflineFirst(context: Context, id: Int): Result<User> {
         val loginDao = DatabaseProvider.getDatabase(context).loginDao()
 
-        // 1. Intentamos buscar en la DB local primero
-        val localUser = loginDao.loadById(intArrayOf(id)).firstOrNull()
-
-        if (localUser != null) {
-            // ¡Éxito! Tenemos los datos sin usar internet
-            return Result.success(localUser)
-        }
-
-        // 2. Si no hay nada local, vamos al servidor
+        // 1. Intentamos consultar primero la red para obtener los datos completos del servidor (nombre, apellido, usuario, email)
         return try {
             val response = apiProfile.getUser(id)
             if (response.isSuccessful && response.body() != null) {
                 val data = response.body()!!
+                // Extraer 'body' o 'user' si la respuesta viene envuelta en standardResponse/body
+                val userMap = (data["body"] as? Map<*, *>) ?: (data["user"] as? Map<*, *>) ?: data
+
+                val existingUser = loginDao.loadById(intArrayOf(id)).firstOrNull()
+                val passwordToKeep = existingUser?.password ?: ""
+
                 val userFromServer = User(
                     id_user = id,
-                    nombre = data["nombre"]?.toString() ?: "",
-                    apellido = data["apellido"]?.toString() ?: "",
-                    usuario = data["usuario"]?.toString() ?: "",
-                    password = "" // No guardamos password aquí ya que viene del endpoint de detalles, no de login
+                    nombre = userMap["nombre"]?.toString() ?: existingUser?.nombre ?: "",
+                    apellido = userMap["apellido"]?.toString() ?: existingUser?.apellido ?: "",
+                    usuario = userMap["usuario"]?.toString() ?: existingUser?.usuario ?: "",
+                    password = passwordToKeep,
+                    email = userMap["email"]?.toString() ?: existingUser?.email ?: ""
                 )
 
-                // 3. ¡IMPORTANTE! Guardamos en local para la próxima vez
+                // Guardar/Actualizar en SQLite local con la informacion completa
                 loginDao.insertAll(userFromServer)
 
                 Result.success(userFromServer)
             } else {
-                Result.failure(Exception("Usuario no encontrado en ningún lugar"))
+                val localUser = loginDao.loadById(intArrayOf(id)).firstOrNull()
+                if (localUser != null) Result.success(localUser)
+                else Result.failure(Exception("Usuario no encontrado"))
             }
         } catch (e: Exception) {
-            Result.failure(Exception("Sin conexión y no hay datos locales"))
+            // 2. Si falla la red (offline), usamos los datos locales como respaldo
+            val localUser = loginDao.loadById(intArrayOf(id)).firstOrNull()
+            if (localUser != null) {
+                Result.success(localUser)
+            } else {
+                Result.failure(Exception("Sin conexión y no hay datos locales"))
+            }
         }
     }
 }

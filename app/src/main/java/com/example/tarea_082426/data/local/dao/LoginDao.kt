@@ -4,10 +4,18 @@ import androidx.room3.Entity
 import androidx.room3.PrimaryKey
 
 @Entity(tableName = "users")
+// data class User(
+//     @PrimaryKey val id_user: Int,
+//     val nombre: String,
+//     val apellido: String,
+//     val usuario: String,
+//     val password: String
+// )
 data class User(
     @PrimaryKey val id_user: Int,
     val nombre: String,
     val apellido: String,
     val usuario: String,
-    val password: String
+    val password: String,
+    val email: String = ""
 )

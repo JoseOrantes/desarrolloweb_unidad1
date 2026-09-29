@@ -27,12 +27,20 @@ class LoginRepository {
                 // Guardamos en local para futuros inicios de sesión offline
                 val userRes = loginResponse.body?.user
                 if (userRes != null) {
+                    // val localUser = User(
+                    //     id_user = userRes.id ?: 0,
+                    //     nombre = userRes.nombre ?: "",
+                    //     apellido = userRes.apellido ?: "",
+                    //     usuario = usuario,
+                    //     password = password
+                    // )
                     val localUser = User(
                         id_user = userRes.id ?: 0,
                         nombre = userRes.nombre ?: "",
                         apellido = userRes.apellido ?: "",
-                        usuario = usuario,
-                        password = password
+                        usuario = userRes.usuario?.ifEmpty { null } ?: usuario,
+                        password = password,
+                        email = userRes.email?.ifEmpty { null } ?: usuario
                     )
                     loginDao.insertAll(localUser)
                 }
@@ -55,7 +63,8 @@ class LoginRepository {
                             nombre = localUser.nombre,
                             apellido = localUser.apellido,
                             usuario = localUser.usuario,
-                            email = "",
+                            // email = "",
+                            email = localUser.email,
                             token = "offline_token"
                         )
                     )

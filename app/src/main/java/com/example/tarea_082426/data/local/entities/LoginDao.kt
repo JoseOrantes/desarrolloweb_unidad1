@@ -14,7 +14,8 @@ interface LoginDao {
     @Query("SELECT * FROM users WHERE id_user IN (:userIds)")
     suspend fun loadById(userIds: IntArray): List<User>
 
-    @Query("SELECT * FROM users WHERE usuario = :u AND password = :p LIMIT 1")
+    // @Query("SELECT * FROM users WHERE usuario = :u AND password = :p LIMIT 1")
+    @Query("SELECT * FROM users WHERE (usuario = :u OR email = :u) AND password = :p LIMIT 1")
     suspend fun checkOfflineLogin(u: String, p: String): User?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

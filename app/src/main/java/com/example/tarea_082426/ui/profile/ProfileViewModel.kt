@@ -20,22 +20,49 @@ class ProfileViewModel : ViewModel() {
             _state.value = _state.value.copy(isLoading = true)
 
             val userResult = repository.getUserOfflineFirst(context, id)
-            val profileResult = repository.getProfile(id)
+            // val profileResult = repository.getProfile(id)
+            val profileResult = repository.getProfileOfflineFirst(context, id)
 
-            if (userResult.isSuccess && profileResult.isSuccess) {
-                val userLocal = userResult.getOrNull()
-                val profileBody = profileResult.getOrNull()?.body
+            // CODIGO ORIGINAL:
+            // if (userResult.isSuccess && profileResult.isSuccess) {
+            //     val userLocal = userResult.getOrNull()
+            //     val profileBody = profileResult.getOrNull()?.body
+            //
+            //     _state.value = _state.value.copy(
+            //         isLoading = false,
+            //         id = id,
+            //         userId = id,
+            //         nombre = userLocal?.nombre ?: "",
+            //         apellido = userLocal?.apellido ?: "",
+            //         usuario = userLocal?.id_user?.toString() ?: "", // O usar usuario si se agrega a la entidad User
+            //         fotoBase64 = profileBody?.fotoBase64 ?: "",
+            //         telefono = profileBody?.telefono ?: "",
+            //         correo = userLocal?.nombre ?: "", // Nota: Ajustar según campos disponibles en User entity
+            //         fechaNac = profileBody?.fechaNac ?: "",
+            //         genero = profileBody?.genero ?: ""
+            //     )
+            // } else {
+            //     _state.value = _state.value.copy(
+            //         isLoading = false,
+            //         error = "Error al cargar datos"
+            //     )
+            // }
 
+            // CORRECCION:
+            val userLocal = userResult.getOrNull()
+            val profileBody = profileResult.getOrNull()?.body
+
+            if (userResult.isSuccess || profileResult.isSuccess) {
                 _state.value = _state.value.copy(
                     isLoading = false,
                     id = id,
                     userId = id,
                     nombre = userLocal?.nombre ?: "",
                     apellido = userLocal?.apellido ?: "",
-                    usuario = userLocal?.id_user?.toString() ?: "", // O usar usuario si se agrega a la entidad User
+                    usuario = if (!userLocal?.usuario.isNullOrEmpty()) userLocal.usuario else userLocal?.email ?: "",
                     fotoBase64 = profileBody?.fotoBase64 ?: "",
                     telefono = profileBody?.telefono ?: "",
-                    correo = userLocal?.nombre ?: "", // Nota: Ajustar según campos disponibles en User entity
+                    correo = if (!userLocal?.email.isNullOrEmpty()) userLocal.email else profileBody?.correo ?: "",
                     fechaNac = profileBody?.fechaNac ?: "",
                     genero = profileBody?.genero ?: ""
                 )
