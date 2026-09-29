@@ -1,5 +1,7 @@
 package com.example.tarea_082426.model
 
+import android.graphics.Bitmap
+
 data class ProfileState(
     val isLoading: Boolean = false,
     val error: String? = null,
@@ -12,5 +14,7 @@ data class ProfileState(
     val telefono: String = "",
     val correo: String = "",
     val fechaNac: String = "",
-    val genero: String = ""
+    val genero: String = "",
+    //Para lo de la foto
+    val fotoPerfil: Bitmap? = null
 )

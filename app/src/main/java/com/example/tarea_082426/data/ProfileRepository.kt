@@ -5,6 +5,7 @@ import com.example.tarea_082426.data.local.DatabaseProvider
 import com.example.tarea_082426.data.local.dao.Profile
 import com.example.tarea_082426.data.local.entities.User
 import com.example.tarea_082426.data.remote.RetrofitClient
+import com.example.tarea_082426.model.request.ProfileRequest
 import com.example.tarea_082426.model.response.Profile.ProfileBody
 import com.example.tarea_082426.model.response.Profile.ProfileResponse
 import com.example.tarea_082426.model.response.StandardResponse
@@ -167,6 +168,33 @@ class ProfileRepository {
             } else {
                 Result.failure(Exception("Sin conexión y no hay datos locales"))
             }
+        }
+    }
+
+    suspend fun updateProfile(context: Context, id: Int, profileRequest: ProfileRequest): Result<StandardResponse> {
+        val profileDao = DatabaseProvider.getDatabase(context).profileDao()
+
+        // 1. Guardar localmente en SQLite
+        val localProfile = Profile(
+            userId = id,
+            fotoBase64 = profileRequest.fotoBase64,
+            telefono = profileRequest.telefono,
+            correo = profileRequest.correo,
+            fechaNac = profileRequest.fechaNac,
+            genero = profileRequest.genero
+        )
+        profileDao.insertAll(localProfile)
+
+        // 2. Enviar a MariaDB / AWS via Retrofit
+        return try {
+            val response = apiProfile.updateProfile(id, profileRequest)
+            if (response.isSuccessful && response.body() != null) {
+                Result.success(response.body()!!)
+            } else {
+                Result.failure(Exception("Error al actualizar perfil en servidor"))
+            }
+        } catch (e: Exception) {
+            Result.success(StandardResponse(200, "Guardado en SQLite localmente"))
         }
     }
 }

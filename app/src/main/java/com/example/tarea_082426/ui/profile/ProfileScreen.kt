@@ -1,5 +1,12 @@
 package com.example.tarea_082426.ui.profile
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,10 +35,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
@@ -46,6 +56,32 @@ fun ProfileScreen(
 ) {
     val state by profileViewModel.state.collectAsState()
     val context = LocalContext.current
+
+    //Para lo de la foto
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicturePreview(),
+    ) { bitmap: Bitmap? ->
+        if (bitmap != null) {
+            profileViewModel.onFotoTomada(bitmap, context)
+        }
+    }
+
+    // Permisos
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { concedido ->
+        if (concedido) cameraLauncher.launch(null)
+    }
+
+    // Revisa los permisos del usuario antes de abrir la cámara
+    fun abrirCamara() {
+        val yaConcedido = ContextCompat.checkSelfPermission(
+            context, Manifest.permission.CAMERA
+        ) == PackageManager.PERMISSION_GRANTED
+
+        if (yaConcedido) cameraLauncher.launch(null)
+        else permissionLauncher.launch(Manifest.permission.CAMERA)
+    }
 
     LaunchedEffect(id) {
         profileViewModel.loadProfile(id, context)
@@ -73,15 +109,26 @@ fun ProfileScreen(
             modifier = Modifier
                 .size(100.dp)
                 .clip(CircleShape),
-            color = MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.primary,
+            onClick = {
+                abrirCamara()
+            }
         ) {
             Box(contentAlignment = Alignment.Center) {
-                Text(
-                    text = "${displayNombre.firstOrNull() ?: ""}${displayApellido.firstOrNull() ?: ""}",
-                    fontSize = 36.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onPrimary
-                )
+                if (state.fotoPerfil != null){
+                    Image(
+                        bitmap = state.fotoPerfil!!.asImageBitmap(),
+                        contentDescription = "Foto de perfil",
+                        modifier = Modifier.fillMaxSize()
+                    )
+                } else {
+                    Text(
+                        text = "${displayNombre.firstOrNull() ?: ""}${displayApellido.firstOrNull() ?: ""}",
+                        fontSize = 36.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
             }
         }
 
