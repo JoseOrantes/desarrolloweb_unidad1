@@ -43,6 +43,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import android.net.Uri
+import android.graphics.ImageDecoder
+import android.provider.MediaStore
+import android.os.Build
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 
 @Composable
 fun ProfileScreen(
@@ -71,6 +81,26 @@ fun ProfileScreen(
         contract = ActivityResultContracts.RequestPermission()
     ) { concedido ->
         if (concedido) cameraLauncher.launch(null)
+    }
+
+    // Dando opcion de gallery
+    var mostrarOpcionesFoto by remember { mutableStateOf(false) }
+
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) {
+        uri: Uri? ->
+        if (uri != null) {
+            // Convirtiendo Uri a Bitmap
+            val bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.contentResolver, uri))
+            } else {
+                @Suppress("DEPRECATION")
+                MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
+            }
+            //Enviando bitmap a viewModel
+            profileViewModel.onFotoTomada(bitmap, context)
+        }
     }
 
     // Revisa los permisos del usuario antes de abrir la cámara
@@ -111,7 +141,9 @@ fun ProfileScreen(
                 .clip(CircleShape),
             color = MaterialTheme.colorScheme.primary,
             onClick = {
-                abrirCamara()
+                //abrirCamara()
+                //Abre las opciones de gallery o camera
+                mostrarOpcionesFoto = true
             }
         ) {
             Box(contentAlignment = Alignment.Center) {
@@ -187,6 +219,34 @@ fun ProfileScreen(
         ) {
             Text("Cerrar Sesión")
         }
+    }
+    //Dialogo de Alerta
+    if (mostrarOpcionesFoto) {
+        AlertDialog(
+            onDismissRequest = { mostrarOpcionesFoto = false },
+            title = { Text("Foto de perfil") },
+            text = { Text("¿De dónde deseas seleccionar tu imagen?") },
+            confirmButton = {
+                TextButton  (
+                    onClick = {
+                        mostrarOpcionesFoto = false
+                        abrirCamara()
+                    }
+                ) {
+                    Text("Cámara")
+                }
+            },
+            dismissButton = {
+                TextButton (
+                    onClick = {
+                        mostrarOpcionesFoto = false
+                        galleryLauncher.launch("image/*")
+                    }
+                ) {
+                    Text("Galería")
+                }
+            }
+        )
     }
 }
 
